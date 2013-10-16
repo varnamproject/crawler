@@ -1,0 +1,7 @@
+[
+  {"site":"http://google.com",
+    "depth": 20,
+    "section": "div#section",
+    "skip": ["Edit"]
+  } 
+]
