@@ -7,7 +7,7 @@ import (
 )
 
 type SiteConfig struct{
-  Url string `json:site`
+  Url string `json:url`
   Depth int `json:depth`
   Section string `json:section`
   Skip []string `json:skip`
