@@ -2,6 +2,6 @@
   {"url":"http://en.wikipedia.org/wiki/Film_Editor",
     "depth": 2,
     "section": "div#mw-content-text",
-    "skip": ["Edit"]
+    "skip": ["[edit]"]
   }
 ]

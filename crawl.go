@@ -14,6 +14,7 @@ type CrawlerExtender struct {
 	gocrawl.DefaultExtender
 	Section string
 	outDir  string
+	skips   []string
 }
 
 func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, doc *goquery.Document) (interface{}, bool) {
@@ -27,6 +28,9 @@ func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, 
 	defer f.Close()
 
 	body := doc.Find(this.Section).Text()
+	for _, skip := range this.skips {
+		body = strings.Replace(body, skip, "", -1)
+	}
 	f.WriteString(body)
 
 	return nil, true
@@ -37,6 +41,7 @@ func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
 	crawler := new(CrawlerExtender)
 	crawler.Section = siteConfig.Section
 	crawler.outDir = *outDir
+	crawler.skips = siteConfig.Skip
 
 	opts := gocrawl.NewOptions(crawler)
 	opts.CrawlDelay = 1 * time.Second
