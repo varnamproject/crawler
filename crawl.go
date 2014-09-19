@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/PuerkitoBio/gocrawl"
-	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/gocrawl"
+	"github.com/PuerkitoBio/goquery"
 )
 
 type CrawlerExtender struct {
@@ -27,13 +28,19 @@ func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, 
 	f, _ := os.Create(this.outDir + "/" + title + ".txt")
 	defer f.Close()
 
-	body := doc.Find(this.Section).Text()
+	section := doc.Find(this.Section)
+	body := section.Text()
 	for _, skip := range this.skips {
 		body = strings.Replace(body, skip, "", -1)
 	}
 	f.WriteString(body)
-
-	return nil, true
+	aTags := section.Find("a")
+	links := make([]string, 10)
+	for i := range aTags.Nodes {
+		link, _ := aTags.Eq(i).Attr("href")
+		links = append(links, link)
+	}
+	return links, false
 }
 
 func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
