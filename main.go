@@ -12,7 +12,6 @@ var (
 	outDir = flag.String("o", "./output", "Output directory to save crawled data")
 )
 
-
 func main() {
 	flag.Parse()
 	siteConfigs := GetConfig(*config)
@@ -21,8 +20,8 @@ func main() {
 
 	var wg sync.WaitGroup
 	for _, siteConfig := range siteConfigs {
-    wg.Add(1)
-		go crawlSite(siteConfig,&wg)
+		wg.Add(1)
+		go crawlSite(siteConfig, &wg)
 	}
 
 	wg.Wait()
@@ -34,5 +33,3 @@ func prepareOutputDir() {
 		os.Exit(1)
 	}
 }
-
-
