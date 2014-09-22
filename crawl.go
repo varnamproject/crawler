@@ -51,7 +51,7 @@ func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
 	defer wg.Done()
 	crawler := new(CrawlerExtender)
 	crawler.Section = siteConfig.Section
-	crawler.outDir = *outDir
+	crawler.outDir = outDir
 	crawler.skips = siteConfig.Skip
 
 	opts := gocrawl.NewOptions(crawler)
