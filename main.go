@@ -5,29 +5,35 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"unicode"
 )
 
 var (
-	config = flag.String("c", "./config.json", "Configuration file for crawler")
-	outDir string
+	configFile = flag.String("c", "./config.json", "Configuration file for crawler")
+	noCrawl    = flag.Bool("n", false, "Dont crawl, only generate words")
+	outDir     string
 )
 
 func main() {
 	flag.StringVar(&outDir, "o", "./output", "Output directory to save crawled data")
 	flag.Parse()
-	siteConfigs := GetConfig(*config)
+	config := GetConfig(*configFile)
 	prepareOutputDir()
-	fmt.Printf("No of sites to crawl : %d\n", len(siteConfigs))
+	code, ok := unicode.Scripts[config.Unicode]
+	if !ok {
+		panic("Unable to find unicode with name " + config.Unicode)
+	}
+	if !*noCrawl {
+		fmt.Printf("No of sites to crawl : %d\n", len(config.Sites))
+		var wg sync.WaitGroup
 
-	var wg sync.WaitGroup
-
-	// for _, siteConfig := range siteConfigs {
-	// 	wg.Add(1)
-	// 	go crawlSite(siteConfig, &wg)
-	// }
-
-	findAllTextFiles(outDir)
-	wg.Wait()
+		for _, siteConfig := range config.Sites {
+			wg.Add(1)
+			go crawlSite(siteConfig, &wg)
+		}
+		wg.Wait()
+	}
+	genUnicodeWordFiles(outDir, code)
 }
 
 func prepareOutputDir() {
@@ -36,10 +42,3 @@ func prepareOutputDir() {
 		os.Exit(1)
 	}
 }
-
-/*
-Read All files
-Find all malayalam words in the file
-add it to the map
-aggregate the map
-*/
