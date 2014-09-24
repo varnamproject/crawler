@@ -7,18 +7,19 @@ import (
 )
 
 type SiteConfig struct {
-	Url     string   `json:url`
-	Depth   int      `json:depth`
-	Section string   `json:section`
-	Skip    []string `json:skip`
+	Url            string   `json:url`
+	Depth          int      `json:depth`
+	Section        string   `json:section`
+	IsSectionLinks bool     `json:section_links`
+	Skip           []string `json:skip`
 }
 
 type Config struct {
-	Unicode string       `json:unicode`
-	Sites   []SiteConfig `json:sites`
+	Script string       `json:script`
+	Sites  []SiteConfig `json:sites`
 }
 
-func GetConfig(path string) Config {
+func GetConfig(path string) *Config {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal("Unable to read file")
@@ -28,5 +29,5 @@ func GetConfig(path string) Config {
 	if err != nil {
 		log.Fatal("Unable to parse json file")
 	}
-	return config
+	return &config
 }

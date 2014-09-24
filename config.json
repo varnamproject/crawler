@@ -1,13 +1,15 @@
 {
-  "unicode": "Malayalam",
+  "script": "Devanagari",
   "sites": [
     {
-      "url": "http://ml.wikipedia.org/wiki/%E0%B4%B8%E0%B5%8D%E0%B4%AA%E0%B5%87%E0%B4%82_%E0%B4%A4%E0%B4%BF%E0%B4%AE%E0%B4%BF%E0%B4%82%E0%B4%97%E0%B4%B2%E0%B4%82",
-      "depth": 1,
+      "url": "http://hi.wikipedia.org/wiki/2014_%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4_-_%E0%A4%AA%E0%A4%BE%E0%A4%95%E0%A4%BF%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A4%BE%E0%A4%A8_%E0%A4%AC%E0%A4%BE%E0%A4%A2%E0%A4%BC",
+      "depth": 10,
       "section": "div#mw-content-text",
+      "section_links": false,
       "skip": [
-        "[തിരുത്തുക]"
+        "[संपादित करें]"
       ]
     }
   ]
 }
+

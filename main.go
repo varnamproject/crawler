@@ -19,26 +19,29 @@ func main() {
 	flag.Parse()
 	config := GetConfig(*configFile)
 	prepareOutputDir()
-	code, ok := unicode.Scripts[config.Unicode]
+	script, ok := unicode.Scripts[config.Script]
 	if !ok {
-		panic("Unable to find unicode with name " + config.Unicode)
+		panic("Unable to find unicode script with name " + config.Script)
 	}
 	if !*noCrawl {
-		fmt.Printf("No of sites to crawl : %d\n", len(config.Sites))
-		var wg sync.WaitGroup
-
-		for _, siteConfig := range config.Sites {
-			wg.Add(1)
-			go crawlSite(siteConfig, &wg)
-		}
-		wg.Wait()
+		crawlAlllSites(config)
 	}
-	genUnicodeWordFiles(outDir, code)
+	genUnicodeWordFiles(outDir, script)
+}
+
+func crawlAlllSites(config *Config) {
+	fmt.Printf("No of sites to crawl : %d\n", len(config.Sites))
+	var wg sync.WaitGroup
+
+	for _, siteConfig := range config.Sites {
+		wg.Add(1)
+		go crawlSite(siteConfig, &wg)
+	}
+	wg.Wait()
 }
 
 func prepareOutputDir() {
 	if err := os.MkdirAll(outDir, os.ModePerm); err != nil {
-		fmt.Println("Unable to create output dir: ", err)
-		os.Exit(1)
+		panic(err)
 	}
 }

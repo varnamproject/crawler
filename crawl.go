@@ -15,24 +15,20 @@ import (
 
 type CrawlerExtender struct {
 	gocrawl.DefaultExtender
-	Section string
-	outDir  string
-	skips   []string
+	Section        string
+	outDir         string
+	isSectionLinks bool
+	skips          []string
 }
 
 func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, doc *goquery.Document) (interface{}, bool) {
 
 	if doc.Find(this.Section).Length() == 0 {
+		fmt.Println("Nothing in this section")
 		return nil, true
 	}
 
 	section := doc.Find(this.Section)
-	aTags := section.Find("a")
-	links := make([]string, 10)
-	for i := range aTags.Nodes {
-		link, _ := aTags.Eq(i).Attr("href")
-		links = append(links, link)
-	}
 	go func() {
 		title := fmt.Sprintf("%v", rand.Int63())
 		f, _ := os.Create(this.outDir + "/" + title[:] + ".txt")
@@ -43,8 +39,17 @@ func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, 
 		}
 		f.WriteString(body)
 	}()
-
-	return links, false
+	if this.isSectionLinks {
+		aTags := section.Find("a")
+		links := make([]string, 10)
+		for i := range aTags.Nodes {
+			link, _ := aTags.Eq(i).Attr("href")
+			links = append(links, link)
+		}
+		return links, false
+	} else {
+		return nil, true
+	}
 }
 
 func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
@@ -53,7 +58,7 @@ func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
 	crawler.Section = siteConfig.Section
 	crawler.outDir = outDir
 	crawler.skips = siteConfig.Skip
-
+	crawler.isSectionLinks = siteConfig.IsSectionLinks
 	opts := gocrawl.NewOptions(crawler)
 	opts.CrawlDelay = 1 * time.Second
 

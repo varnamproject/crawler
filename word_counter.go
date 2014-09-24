@@ -14,7 +14,7 @@ func findAllTextFiles(outputDir string) (files []string, err error) {
 	return
 }
 
-func findUnicodeWords(file string, code *unicode.RangeTable) {
+func findUnicodeWords(file string, script *unicode.RangeTable) {
 	f, err := os.Open(file)
 	if err != nil {
 		fmt.Printf("Error while opening file %s\n", file)
@@ -32,8 +32,7 @@ func findUnicodeWords(file string, code *unicode.RangeTable) {
 	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {
 		word := scanner.Text()
-		if isUnicodeWord(word, code) {
-			fmt.Println(word)
+		if isUnicodeWord(word, script) {
 			w.WriteString(word)
 			w.WriteString("\n")
 		}
@@ -41,11 +40,11 @@ func findUnicodeWords(file string, code *unicode.RangeTable) {
 	w.Flush()
 }
 
-func isUnicodeWord(word string, code *unicode.RangeTable) bool {
+func isUnicodeWord(word string, script *unicode.RangeTable) bool {
 	status := true
 	for len(word) > 0 {
 		r, size := utf8.DecodeRuneInString(word)
-		if !unicode.Is(code, r) {
+		if !unicode.Is(script, r) {
 			status = false
 		}
 		word = word[size:]
@@ -53,12 +52,12 @@ func isUnicodeWord(word string, code *unicode.RangeTable) bool {
 	return status
 }
 
-func genUnicodeWordFiles(outputDir string, code *unicode.RangeTable) {
+func genUnicodeWordFiles(outputDir string, script *unicode.RangeTable) {
 	files, err := findAllTextFiles(outputDir)
 	if err != nil {
 		fmt.Println(err)
 	}
 	for _, f := range files {
-		findUnicodeWords(f, code)
+		findUnicodeWords(f, script)
 	}
 }
