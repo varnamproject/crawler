@@ -14,30 +14,22 @@ func findAllTextFiles(outputDir string) (files []string, err error) {
 	return
 }
 
-func findUnicodeWords(file string, script *unicode.RangeTable) {
+func findUnicodeWords(file string, script *unicode.RangeTable, ch chan string) {
 	f, err := os.Open(file)
 	if err != nil {
 		fmt.Printf("Error while opening file %s\n", file)
 		return
 	}
 	defer f.Close()
-	wf, err := os.Create(file + ".words")
-	if err != nil {
-		fmt.Printf("Error while creating word file %s\n", file)
-		return
-	}
-	defer wf.Close()
+
 	scanner := bufio.NewScanner(f)
-	w := bufio.NewWriter(wf)
 	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {
 		word := scanner.Text()
 		if isUnicodeWord(word, script) {
-			w.WriteString(word)
-			w.WriteString("\n")
+			ch <- word
 		}
 	}
-	w.Flush()
 }
 
 func isUnicodeWord(word string, script *unicode.RangeTable) bool {
@@ -52,12 +44,13 @@ func isUnicodeWord(word string, script *unicode.RangeTable) bool {
 	return status
 }
 
-func genUnicodeWordFiles(outputDir string, script *unicode.RangeTable) {
+func genUnicodeWordFiles(outputDir string, script *unicode.RangeTable, ch chan string) {
+	defer close(ch)
 	files, err := findAllTextFiles(outputDir)
 	if err != nil {
 		fmt.Println(err)
 	}
 	for _, f := range files {
-		findUnicodeWords(f, script)
+		findUnicodeWords(f, script, ch)
 	}
 }

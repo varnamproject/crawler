@@ -23,10 +23,12 @@ func main() {
 	if !ok {
 		panic("Unable to find unicode script with name " + config.Script)
 	}
+	ch, done := initDb()
 	if !*noCrawl {
 		crawlAlllSites(config)
 	}
-	genUnicodeWordFiles(outDir, script)
+	genUnicodeWordFiles(outDir, script, ch)
+	<-done
 }
 
 func crawlAlllSites(config *Config) {
