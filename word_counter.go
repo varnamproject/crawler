@@ -15,6 +15,7 @@ func findAllTextFiles(outputDir string) (files []string, err error) {
 }
 
 func findUnicodeWords(file string, script *unicode.RangeTable, ch chan string) {
+	fmt.Printf("Trying words in %s\n", file)
 	f, err := os.Open(file)
 	if err != nil {
 		fmt.Printf("Error while opening file %s\n", file)

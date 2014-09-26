@@ -25,20 +25,32 @@ func main() {
 	script := getUnicodeScript(config.Script)
 	ch, done := initDb()
 	if !*noCrawl {
-		crawlAlllSites(config)
+		fileChannels := crawlAlllSites(config)
+		var wg sync.WaitGroup
+		output := func(c <-chan string) {
+			for file := range c {
+				findUnicodeWords(file, script, ch)
+			}
+			wg.Done()
+		}
+		wg.Add(len(fileChannels))
+		for _, c := range fileChannels {
+			go output(c)
+		}
+		wg.Wait()
+		close(ch)
 	}
-	genUnicodeWordFiles(outDir, script, ch)
+	// genUnicodeWordFiles(outDir, script, ch)
 	<-done
 }
 
-func crawlAlllSites(config *Config) {
+func crawlAlllSites(config *Config) []<-chan string {
 	fmt.Printf("No of sites to crawl : %d\n", len(config.Sites))
-	var wg sync.WaitGroup
-	for _, siteConfig := range config.Sites {
-		wg.Add(1)
-		go crawlSite(siteConfig, &wg)
+	fileChannels := make([]<-chan string, len(config.Sites))
+	for i, siteConfig := range config.Sites {
+		fileChannels[i] = crawlSite(siteConfig)
 	}
-	wg.Wait()
+	return fileChannels
 }
 
 func getUnicodeScript(scriptName string) *unicode.RangeTable {

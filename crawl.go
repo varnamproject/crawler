@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/gocrawl"
@@ -19,26 +18,24 @@ type CrawlerExtender struct {
 	outDir         string
 	isSectionLinks bool
 	skips          []string
+	files          chan string
 }
 
 func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, doc *goquery.Document) (interface{}, bool) {
-
 	if doc.Find(this.Section).Length() == 0 {
 		fmt.Println("Nothing in this section")
 		return nil, true
 	}
-
 	section := doc.Find(this.Section)
-	go func() {
-		title := fmt.Sprintf("%v", rand.Int63())
-		f, _ := os.Create(this.outDir + "/" + title[:] + ".txt")
-		defer f.Close()
-		body := section.Text()
-		for _, skip := range this.skips {
-			body = strings.Replace(body, skip, "", -1)
-		}
-		f.WriteString(body)
-	}()
+	title := fmt.Sprintf("%v", rand.Int63())
+	body := section.Text()
+	for _, skip := range this.skips {
+		body = strings.Replace(body, skip, "", -1)
+	}
+	err := ioutil.WriteFile(this.outDir+"/"+title[:]+".txt", []byte(body), 0644)
+	if err == nil {
+		this.files <- this.outDir + "/" + title[:] + ".txt"
+	}
 	if this.isSectionLinks {
 		aTags := section.Find("a")
 		links := make([]string, 10)
@@ -52,9 +49,10 @@ func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, 
 	}
 }
 
-func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
-	defer wg.Done()
+func crawlSite(siteConfig SiteConfig) <-chan string {
+	files := make(chan string, 10)
 	crawler := new(CrawlerExtender)
+	crawler.files = files
 	crawler.Section = siteConfig.Section
 	crawler.outDir = outDir
 	crawler.skips = siteConfig.Skip
@@ -65,5 +63,9 @@ func crawlSite(siteConfig SiteConfig, wg *sync.WaitGroup) {
 	opts.MaxVisits = siteConfig.Depth
 
 	c := gocrawl.NewCrawlerWithOptions(opts)
-	c.Run(siteConfig.Url)
+	go func() {
+		defer close(files)
+		c.Run(siteConfig.Url)
+	}()
+	return files
 }
