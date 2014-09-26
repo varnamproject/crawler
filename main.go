@@ -39,8 +39,9 @@ func main() {
 		}
 		wg.Wait()
 		close(ch)
+	} else {
+		genUnicodeWordFiles(outDir, script, ch)
 	}
-	// genUnicodeWordFiles(outDir, script, ch)
 	<-done
 }
 
