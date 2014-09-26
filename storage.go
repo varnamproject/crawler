@@ -24,10 +24,7 @@ func createTable(db *sql.DB) {
 	sqlStmt := `
 	create table word_count (name text not null primary key, value integer);
 	`
-	_, err := db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q\n", err)
-	}
+	db.Exec(sqlStmt)
 }
 
 func storeWords(db *sql.DB, wordsChannel chan string, done chan struct{}) {
