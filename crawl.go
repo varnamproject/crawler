@@ -32,9 +32,9 @@ func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, 
 	for _, skip := range this.skips {
 		body = strings.Replace(body, skip, "", -1)
 	}
-	err := ioutil.WriteFile(this.outDir+"/"+title[:]+".txt", []byte(body), 0644)
+	err := ioutil.WriteFile(this.outDir+"/"+title[:]+".words", []byte(body), 0644)
 	if err == nil {
-		this.files <- this.outDir + "/" + title[:] + ".txt"
+		this.files <- this.outDir + "/" + title[:] + ".words"
 	}
 	if this.isSectionLinks {
 		aTags := section.Find("a")
@@ -68,4 +68,13 @@ func crawlSite(siteConfig SiteConfig) <-chan string {
 		c.Run(siteConfig.Url)
 	}()
 	return files
+}
+
+func crawlAlllSites(config *Config) []<-chan string {
+	fmt.Printf("No of sites to crawl : %d\n", len(config.Sites))
+	fileChannels := make([]<-chan string, len(config.Sites))
+	for i, siteConfig := range config.Sites {
+		fileChannels[i] = crawlSite(siteConfig)
+	}
+	return fileChannels
 }

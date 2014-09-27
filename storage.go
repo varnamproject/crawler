@@ -8,16 +8,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func initDb() (chan string, chan struct{}) {
+func initDb() *sql.DB {
 	db, err := sql.Open("sqlite3", "words.db")
 	if err != nil {
 		panic("Error while creating db")
 	}
 	createTable(db)
-	wordsChannel := make(chan string, 100)
-	done := make(chan struct{})
-	go storeWords(db, wordsChannel, done)
-	return wordsChannel, done
+	return db
+
 }
 
 func createTable(db *sql.DB) {
@@ -27,8 +25,14 @@ func createTable(db *sql.DB) {
 	db.Exec(sqlStmt)
 }
 
+func wordCollector(db *sql.DB) (chan string, chan struct{}) {
+	wordsChannel := make(chan string, 100)
+	done := make(chan struct{})
+	go storeWords(db, wordsChannel, done)
+	return wordsChannel, done
+}
+
 func storeWords(db *sql.DB, wordsChannel chan string, done chan struct{}) {
-	defer db.Close()
 	tx, err := db.Begin()
 	if err != nil {
 		log.Fatal(err)
