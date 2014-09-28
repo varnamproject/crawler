@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -51,4 +53,25 @@ func storeWords(db *sql.DB, wordsChannel chan string, done chan struct{}) {
 	tx.Commit()
 	fmt.Println("DONE")
 	done <- struct{}{}
+}
+
+func generateVarnamFiles(db *sql.DB) {
+	rows, err := db.Query("select * from word_count order by value desc")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	fo, err := os.Create("output.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer fo.Close()
+	w := bufio.NewWriter(fo)
+	for rows.Next() {
+		var value uint64
+		var word string
+		rows.Scan(&word, &value)
+		w.WriteString(fmt.Sprintf("%s %d\n", word, value))
+	}
+	w.Flush()
 }

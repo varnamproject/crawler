@@ -18,7 +18,7 @@ func init() {
 	flag.StringVar(&configFile, "c", "./config.json", "Configuration file for crawler")
 	flag.StringVar(&outDir, "o", "./output", "Output directory to save crawled data")
 	flag.BoolVar(&noCrawl, "no-crawl", false, "Dont crawl, only generate words")
-	flag.BoolVar(&keepFiles, "k", true, "Keep crawled file for future")
+	flag.BoolVar(&keepFiles, "k", false, "Keep crawled file for future")
 }
 
 func main() {
@@ -51,7 +51,7 @@ func main() {
 		close(ch)
 	}
 	<-done
-
+	generateVarnamFiles(db)
 }
 
 func getUnicodeScript(scriptName string) *unicode.RangeTable {
