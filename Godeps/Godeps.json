@@ -1,0 +1,39 @@
+{
+	"ImportPath": "github.com/varnamproject/crawler",
+	"GoVersion": "go1.3.1",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/cascadia",
+			"Comment": "null-30",
+			"Rev": "4f03c71bc42ba0015a68bea86422f0ecbb71bf70"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.net/html",
+			"Comment": "null-144",
+			"Rev": "ad01a6fcc8a19d3a4478c836895ffe883bd2ceab"
+		},
+		{
+			"ImportPath": "github.com/PuerkitoBio/gocrawl",
+			"Comment": "v0.4.1-11-g7c62846",
+			"Rev": "7c62846d98cfe8701a7f49ab654c1d62c1662cbe"
+		},
+		{
+			"ImportPath": "github.com/PuerkitoBio/goquery",
+			"Comment": "v0.3.2-30-g12a8512",
+			"Rev": "12a851277896ab3921778fea9543634284691034"
+		},
+		{
+			"ImportPath": "github.com/PuerkitoBio/purell",
+			"Comment": "v0.1.0-10-g1909519",
+			"Rev": "1909519b19f44750062c3e8209d65c0921f18060"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-sqlite3",
+			"Rev": "1704ea522da54566fb41576db328ea3c44f702d8"
+		},
+		{
+			"ImportPath": "github.com/temoto/robotstxt.go",
+			"Rev": "2f1297117982b399076203fc13b76a79796a881e"
+		}
+	]
+}
