@@ -36,7 +36,7 @@ func isUnicodeWord(word string, script *unicode.RangeTable) bool {
 	status := true
 	for len(word) > 0 {
 		r, size := utf8.DecodeRuneInString(word)
-		if !unicode.Is(script, r) {
+		if !unicode.Is(script, r) || unicode.IsNumber(r) {
 			status = false
 		}
 		word = word[size:]
