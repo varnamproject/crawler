@@ -25,6 +25,7 @@ func main() {
 	flag.Parse()
 	config := GetConfig(configFile)
 	prepareOutputDir()
+	clearOutputFiles()
 	script := getUnicodeScript(config.Script)
 	db := initDb()
 	defer db.Close()
@@ -52,6 +53,11 @@ func main() {
 	}
 	<-done
 	generateVarnamFiles(db)
+}
+
+func clearOutputFiles() {
+	os.Remove("words.db")
+	os.Remove("output.txt")
 }
 
 func getUnicodeScript(scriptName string) *unicode.RangeTable {
