@@ -32,9 +32,9 @@ func (this *CrawlerExtender) Visit(ctx *gocrawl.URLContext, res *http.Response, 
 	for _, skip := range this.skips {
 		body = strings.Replace(body, skip, "", -1)
 	}
-	err := ioutil.WriteFile(this.outDir+"/"+title[:]+".words", []byte(body), 0644)
+	err := ioutil.WriteFile(this.outDir+"/"+title[:]+".txt", []byte(body), 0644)
 	if err == nil {
-		this.files <- this.outDir + "/" + title[:] + ".words"
+		this.files <- this.outDir + "/" + title[:] + ".txt"
 	}
 	if this.isSectionLinks {
 		aTags := section.Find("a")

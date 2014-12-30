@@ -10,7 +10,7 @@ import (
 )
 
 func findAllTextFiles(outputDir string) (files []string, err error) {
-	files, err = filepath.Glob(filepath.Join(outputDir, "*.words"))
+	files, err = filepath.Glob(filepath.Join(outputDir, "*.txt"))
 	return
 }
 
