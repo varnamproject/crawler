@@ -12,18 +12,25 @@ var (
 	noCrawl    bool
 	outDir     string
 	keepFiles  bool
+	script     string
 )
 
 func init() {
 	flag.StringVar(&configFile, "c", "./config.json", "Configuration file for crawler")
 	flag.StringVar(&outDir, "o", "./output", "Output directory to save crawled data")
+	flag.StringVar(&script, "s", "", "Specify script, if this option provied it will ignore config flag")
 	flag.BoolVar(&noCrawl, "no-crawl", false, "Dont crawl, only generate words")
 	flag.BoolVar(&keepFiles, "k", false, "Keep crawled file for future")
 }
 
 func main() {
 	flag.Parse()
-	config := GetConfig(configFile)
+	var config *Config
+	if script == "" {
+		config = GetConfig(configFile)
+	} else {
+		config = &Config{Script: script}
+	}
 	prepareOutputDir()
 	clearOutputFiles()
 	script := getUnicodeScript(config.Script)
